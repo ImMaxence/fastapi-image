@@ -1,0 +1,10 @@
+version: '3'
+services:
+  fastapi-storage:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./storage:/app/storage
+    environment:
+      - TZ=Europe/Paris
