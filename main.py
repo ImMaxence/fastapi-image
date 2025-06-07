@@ -13,6 +13,7 @@ import hmac
 import hashlib
 import base64
 from dotenv import load_dotenv
+import uuid
 load_dotenv()
 
 # === CONFIGURATION ===
@@ -76,6 +77,7 @@ def generate_signature(filename: str, expires: int) -> str:
     signature = hmac.new(SIGNING_KEY, payload.encode(), hashlib.sha256).digest()
     return base64.urlsafe_b64encode(signature).decode()
 
+# === PRESIGNED URL ===
 @app.post("/generate-upload-url")
 def generate_upload_url(filename: str, credentials: HTTPAuthorizationCredentials = Depends(verify_token)):
     ext = filename.split(".")[-1].lower()
@@ -84,26 +86,27 @@ def generate_upload_url(filename: str, credentials: HTTPAuthorizationCredentials
 
     expires = int((datetime.utcnow() + timedelta(minutes=1)).timestamp())
     sig = generate_signature(filename, expires)
+    # On garde filename initial dans l'URL (utile pour signature)
     return {"upload_url": f"/upload?filename={filename}&expires={expires}&sig={sig}"}
 
-# === FILE UPLOAD ===
+# === FILE UPLOAD (avec renommage en UUID) ===
 @app.post("/upload")
 def upload_file(request: Request, file: UploadFile = File(...)):
-    filename = request.query_params.get("filename")
+    original_filename = request.query_params.get("filename")
     expires = request.query_params.get("expires")
     sig = request.query_params.get("sig")
 
-    if not filename or not expires or not sig:
+    if not original_filename or not expires or not sig:
         raise HTTPException(status_code=400, detail="Missing parameters")
 
-    expected_sig = generate_signature(filename, int(expires))
+    expected_sig = generate_signature(original_filename, int(expires))
     if sig != expected_sig:
         raise HTTPException(status_code=403, detail="Invalid signature")
 
     if datetime.utcnow().timestamp() > int(expires):
         raise HTTPException(status_code=403, detail="Signature expired")
 
-    ext = filename.split(".")[-1].lower()
+    ext = original_filename.split(".")[-1].lower()
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(status_code=400, detail="File type not allowed")
 
@@ -118,18 +121,23 @@ def upload_file(request: Request, file: UploadFile = File(...)):
         raise HTTPException(status_code=429, detail="Upload limit reached for today")
 
     UPLOAD_DIR.mkdir(exist_ok=True)
-    file_path = UPLOAD_DIR / filename
+
+    # Nouveau nom : UUID + extension
+    new_filename = f"{uuid.uuid4().hex}.{ext}"
+    file_path = UPLOAD_DIR / new_filename
+
     with file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     metadata = load_metadata()
-    metadata[filename] = {"last_access": datetime.utcnow().isoformat()}
+    metadata[new_filename] = {"last_access": datetime.utcnow().isoformat()}
     save_metadata(metadata)
 
     ratelimit[today][client_ip] += 1
     save_ratelimit(ratelimit)
 
-    return {"url": f"/files/{filename}"}
+    # Retourne l'URL avec le nouveau nom
+    return {"url": f"/files/{new_filename}"}
 
 # === FILE DOWNLOAD (UPDATES LAST ACCESS) ===
 @app.get("/files/{filename}")
