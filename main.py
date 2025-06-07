@@ -12,18 +12,20 @@ import json
 import hmac
 import hashlib
 import base64
+from dotenv import load_dotenv
+load_dotenv()
 
 # === CONFIGURATION ===
 UPLOAD_DIR = Path("storage")
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
-FRONTEND_ORIGINS = ["https://tonfrontend.com", "https://autrefont.com"]
-TOKEN = "dfef098e2ad447c48942008e85aef6017e3f523a3c7f43f49e9df7c98cdd5d77"
-SIGNING_KEY = b"f27a04224b8f4f80a7c1a0ce99be185741b17369b13e1e48882f6cb878fc7c42"
-EXPIRATION_DAYS = 30
+TOKEN = os.getenv("TOKEN")
+SIGNING_KEY = os.getenv("SIGNING_KEY").encode()
+FRONTEND_ORIGINS = os.getenv("FRONTEND_ORIGINS", "").split(",")
+EXPIRATION_DAYS = 60
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 METADATA_FILE = UPLOAD_DIR / ".metadata.json"
 RATE_LIMIT_FILE = UPLOAD_DIR / ".ratelimit.json"
-MAX_UPLOADS_PER_IP_PER_DAY = 10
+MAX_UPLOADS_PER_IP_PER_DAY = 100
 
 app = FastAPI()
 

@@ -1,0 +1,176 @@
+{
+	"info": {
+		"_postman_id": "3d2be52a-10f0-4aaa-b698-61989105d2c4",
+		"name": "FastApi Image python",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34437979"
+	},
+	"item": [
+		{
+			"name": "generate upload",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "dfef098e2ad447c48942008e85aef6017e3f523a3c7f43f49e9df7c98cdd5d77",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/generate-upload-url?filename=test.png",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"generate-upload-url"
+					],
+					"query": [
+						{
+							"key": "filename",
+							"value": "test.png"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "upload",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/maxou/Downloads/Capture d’écran 2025-06-07 001046.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/upload?filename=test.png&expires=1749240746&sig=z87S9XMTjYxjMOFmX-ao84IyuL2iy2AkK1TAWrxv8GQ=",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"upload"
+					],
+					"query": [
+						{
+							"key": "filename",
+							"value": "test.png"
+						},
+						{
+							"key": "expires",
+							"value": "1749240746"
+						},
+						{
+							"key": "sig",
+							"value": "z87S9XMTjYxjMOFmX-ao84IyuL2iy2AkK1TAWrxv8GQ="
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get list",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "dfef098e2ad447c48942008e85aef6017e3f523a3c7f43f49e9df7c98cdd5d77",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get url",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/files/test.png",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"files",
+						"test.png"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "dfef098e2ad447c48942008e85aef6017e3f523a3c7f43f49e9df7c98cdd5d77",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "filename",
+							"value": "test.png",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"delete"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
