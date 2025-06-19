@@ -21,7 +21,7 @@ UPLOAD_DIR = Path("storage")
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
 TOKEN = os.getenv("TOKEN")
 SIGNING_KEY = os.getenv("SIGNING_KEY").encode()
-FRONTEND_ORIGINS = os.getenv("FRONTEND_ORIGINS", "").split(",")
+BACKEND_ORIGINS = os.getenv("BACKEND_ORIGINS", "").split(",")
 EXPIRATION_DAYS = 60
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 METADATA_FILE = UPLOAD_DIR / ".metadata.json"
@@ -33,7 +33,7 @@ app = FastAPI()
 # === MIDDLEWARE CORS ===
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=FRONTEND_ORIGINS,
+    allow_origins=BACKEND_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
